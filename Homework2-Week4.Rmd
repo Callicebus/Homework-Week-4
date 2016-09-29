@@ -1,0 +1,90 @@
+---
+title: "Homework2-Week4"
+author: "Silvy van Kuijk"
+date: "September 28, 2016"
+output: html_document
+---
+
+
+###<span style="color:green">Homework - Problem 2</span>
+
+Load in the dataset "zombies.csv" from my GitHub repo at. This data includes the first and last name and gender of the entire population of 1000 people who have survived the zombie apocalypse and are now ekeing out an existence somewhere on the East Coast, along with several other variables (height, weight, age, number of years of education, number of zombies they have killed, and college major see here for info on major
+
+f <- file.choose() d <- read.csv(f, sep=",", header=TRUE)
+
+###[1] Calculate the population mean and standard deviation for each quantitative random variable (height, weight, age, number of zombies killed, and years of education). NOTE: You will not want to use the built in var() and sd() commands as these are for samples.
+
+```{r}
+zombies <- file.choose() #Choose you Zombies.csv file!
+zombies <- read.csv(zombies, sep=",", header=TRUE)
+```
+
+I think this should all fit in one function:
+```{r}
+zombies.function <- function(x, M, V, SD){
+  zmean <- mean(x)
+  zvar <- sum((x - mean(x)) ^2) / (length(x) -1)
+  zsd <- sqrt(zvar)
+  list(zmean, zsd)
+}
+#Now I can run the funtion for each of the columns of interest and it will first give you the mean, then the SD:
+
+zombies.function(zombies$age)
+
+zombies.function(zombies$height)
+
+zombies.function(zombies$weight)
+
+zombies.function(zombies$zombies_killed)
+
+zombies.function(zombies$years_of_education)
+```
+
+###[2] Use ggplot and make boxplots of each of these variables by gender.
+
+><span style="color:red">As you can see below, most of the function works perfectly. I just cannot get the Y-label to change for each variable. Do you know how I can make that happen?</span>
+
+```{r}
+library(ggplot2)
+boxplot.function <- function(x){
+bp <- ggplot(data=zombies, aes(x=gender, y=x, fill=gender))
+bp <- bp + geom_boxplot(outlier.colour = "red")
+bp <- bp + theme(axis.text.x=element_text(angle=90))
+bp <- bp + ylab(x)
+bp <- bp + xlab("Gender")
+bp
+}
+boxplot.function(zombies$age)
+
+boxplot.function(zombies$height)
+
+boxplot.function(zombies$weight)
+
+boxplot.function(zombies$zombies_killed)
+
+boxplot.function(zombies$years_of_education)
+```
+
+###[3] Use ggplot and make a scatterplots of height and weight in relation to age. Do these variables seem to be related? In what way?
+
+```{r}
+sp <- ggplot(data=zombies, aes(x=age, y=height)) 
+sp <- sp + xlab("Age") + ylab("Height")
+sp <- sp + geom_point()
+sp <- sp + theme(legend.position="bottom", legend.title=element_blank())
+sp
+```
+
+```{r}
+sp <- ggplot(data=zombies, aes(x=age, y=weight)) 
+sp <- sp + xlab("Age") + ylab("Weight")
+sp <- sp + geom_point()
+sp <- sp + theme(legend.position="bottom", legend.title=element_blank())
+sp
+```
+
+###[4] Using histograms and Q-Q plots, check whether the quantitative variables seem to be drawn from a normal distribution. Which seem to be and which do not (hint: not all are drawn from the normal distribution)? For those that are not, can you determine what common distribution they are drawn from?
+
+###[5] Now use the sample() function to sample ONE subset of 30 zombies (without replacement) from this population and calculate the mean and sample standard deviation for each variable. Also estimate the standard error for each variable and construct the 95% confidence interval for each mean. Note that for the variables that are not drawn from the normal distribution, you will need to base your estimate of the CIs on some different distribution.
+
+###[6] Now drawn 99 more random samples of 30 zombies out and calculate the mean for each of the these samples. Together with the first sample you drew out, you now have a set of 100 means for each variable (each based on 30 observations), which constitutes a sampling distribution for each variable. What are the means and standard deviations of this distribution for each variable? How do the standard deviations compare to the standard errors estimated in [5]? What do these sampling distributions look like? Are they normally distributed? What about for those variables that you concluded were not originally drawn from a normal distribution?
