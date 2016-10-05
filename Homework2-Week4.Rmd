@@ -21,11 +21,12 @@ zombies <- read.csv(zombies, sep=",", header=TRUE)
 
 I think this should all fit in one function:
 ```{r}
-zombies.function <- function(x, M, V, SD){
+zombies.function <- function(x){
   zmean <- mean(x)
   zvar <- sum((x - mean(x)) ^2) / (length(x) -1)
   zsd <- sqrt(zvar)
-  list(zmean, zsd)
+  outcome <- paste("Mean = ", round(zmean, digits=2), ". Standard Deviation = ", round(zsd, digits=2), ".")
+  outcome
 }
 #Now I can run the funtion for each of the columns of interest and it will first give you the mean, then the SD:
 
@@ -42,48 +43,89 @@ zombies.function(zombies$years_of_education)
 
 ###[2] Use ggplot and make boxplots of each of these variables by gender.
 
-><span style="color:red">As you can see below, most of the function works perfectly. I just cannot get the Y-label to change for each variable. Do you know how I can make that happen?</span>
-
+I think this could go in one function too...
 ```{r}
 library(ggplot2)
-boxplot.function <- function(x){
+boxplot.function <- function(x,y){
 bp <- ggplot(data=zombies, aes(x=gender, y=x, fill=gender))
 bp <- bp + geom_boxplot(outlier.colour = "red")
 bp <- bp + theme(axis.text.x=element_text(angle=90))
-bp <- bp + ylab(x)
+bp <- bp + ylab(y)
 bp <- bp + xlab("Gender")
 bp
 }
-boxplot.function(zombies$age)
 
-boxplot.function(zombies$height)
+boxplot.function(zombies$age,"Age")
 
-boxplot.function(zombies$weight)
+boxplot.function(zombies$height, "Height")
 
-boxplot.function(zombies$zombies_killed)
+boxplot.function(zombies$weight, "Weight")
 
-boxplot.function(zombies$years_of_education)
+boxplot.function(zombies$zombies_killed, "Zombies Killed")
+
+boxplot.function(zombies$years_of_education, "Years of Education")
 ```
 
-###[3] Use ggplot and make a scatterplots of height and weight in relation to age. Do these variables seem to be related? In what way?
+###[3] Use ggplot and make scatterplots of height and weight in relation to age. Do these variables seem to be related? In what way?
 
+Ggplot is awesome! You can make really nice looking plots...
 ```{r}
-sp <- ggplot(data=zombies, aes(x=age, y=height)) 
-sp <- sp + xlab("Age") + ylab("Height")
-sp <- sp + geom_point()
-sp <- sp + theme(legend.position="bottom", legend.title=element_blank())
+sp <- ggplot(data=zombies, aes(x=age, y=height, color=weight)) + xlab("Age") + ylab("Height") + geom_point() + stat_smooth(method=lm, se=FALSE, color="red") + theme(plot.background=element_rect(fill="grey"), plot.title=element_text(size=20, face="bold", margin=margin(0, 0, 10, 0)), plot.margin=unit(c(0.5, 0.5, 0.5, 0.5), "cm")) + ggtitle("Relationship between Age and Height")
 sp
 ```
 
+or really ugly ones!
 ```{r}
-sp <- ggplot(data=zombies, aes(x=age, y=weight)) 
-sp <- sp + xlab("Age") + ylab("Weight")
-sp <- sp + geom_point()
-sp <- sp + theme(legend.position="bottom", legend.title=element_blank())
+sp <- ggplot(data=zombies, aes(x=age, y=weight, color=height)) + xlab("Age") + ylab("Weight") + geom_point() + theme(legend.position="bottom", legend.title=element_blank()) + stat_smooth(method=lm, se=FALSE, col="black") + theme(plot.background=element_rect(fill="darkseagreen"), plot.title=element_text(size=20, face="bold", margin=margin(0, 0, 10, 0)), legend.title = element_text(colour="red"), plot.margin=unit(c(0.5, 0.5, 0.5, 0.5), "cm"), panel.grid.major = element_line(color="red", size = 1), panel.grid.minor = element_line(color="chocolate", size = 1)) + ggtitle("Relationship between Age and Weight")
 sp
 ```
+
+These plots show that these variales are indeed related. As the zombies grow older, they grow taller and also increase their weight.
 
 ###[4] Using histograms and Q-Q plots, check whether the quantitative variables seem to be drawn from a normal distribution. Which seem to be and which do not (hint: not all are drawn from the normal distribution)? For those that are not, can you determine what common distribution they are drawn from?
+
+```{r}
+par(mfrow = c(1, 2))
+hist(zombies$age, breaks = 50, main="Histogram for Age", xlab="Age", prob=TRUE, col="grey")
+curve(dnorm(x, mean=mean(zombies$age), sd=sd(zombies$age)), add=TRUE, col="red")
+
+qqnorm(zombies$age, main="Normal QQ plot for Age")
+qqline(zombies$age, col="red")
+```
+```{r}
+par(mfrow = c(1, 2))
+hist(zombies$weight, main="Histogram for Weight", xlab="Weight", prob=TRUE, breaks=50, col="grey")
+curve(dnorm(x, mean=mean(zombies$weight), sd=sd(zombies$weight)), add=TRUE, col="red")
+
+qqnorm(zombies$weight, main="Normal QQ plot for Weight")
+qqline(zombies$weight, col="red")
+```
+```{r}
+par(mfrow = c(1, 2))
+hist(zombies$height, main="Histogram for Height", xlab="Height", prob=TRUE, breaks=50, col="grey")
+curve(dnorm(x, mean=mean(zombies$height), sd=sd(zombies$height)), add=TRUE, col="red")
+
+qqnorm(zombies$height, main="Normal QQ plot for Height")
+qqline(zombies$height, col="red")
+```
+```{r}
+par(mfrow = c(1, 2))
+hist(zombies$years_of_education, main="Histogram for Years of Education", xlab="Years of Education", prob=TRUE, breaks=8, col="grey")
+curve(dnorm(x, mean=mean(zombies$years_of_education), sd=sd(zombies$years_of_education)), add=TRUE, col="red")
+
+qqnorm(zombies$years_of_education, main="Normal QQ plot for Years of Education")
+qqline(zombies$years_of_education, col="red")
+```
+```{r}
+par(mfrow = c(1, 2))
+hist(zombies$zombies_killed, main="Histogram for Zombies Killed", xlab="Zombies Killed", prob=TRUE, breaks=10, col="grey")
+curve(dnorm(x, mean=mean(zombies$zombies_killed), sd=sd(zombies$zombies_killed)), add=TRUE, col="red")
+
+qqnorm(zombies$zombies_killed, main="Normal QQ plot for Zombies Killed")
+qqline(zombies$zombies_killed, col="red")
+```
+
+The variables Years of Education and Zombies killed are the only two that are not normally distributed. The first three variables - Age, Weight, and Height - are normally distributed, shown by the bell-curves in the Histograms and the data in the QQ plots being nicely on top of the line. 
 
 ###[5] Now use the sample() function to sample ONE subset of 30 zombies (without replacement) from this population and calculate the mean and sample standard deviation for each variable. Also estimate the standard error for each variable and construct the 95% confidence interval for each mean. Note that for the variables that are not drawn from the normal distribution, you will need to base your estimate of the CIs on some different distribution.
 
