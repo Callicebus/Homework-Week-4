@@ -15,8 +15,8 @@ f <- file.choose() d <- read.csv(f, sep=",", header=TRUE)
 ###[1] Calculate the population mean and standard deviation for each quantitative random variable (height, weight, age, number of zombies killed, and years of education). NOTE: You will not want to use the built in var() and sd() commands as these are for samples.
 
 ```{r}
-zombies <- file.choose() #Choose you Zombies.csv file!
-zombies <- read.csv(zombies, sep=",", header=TRUE)
+path <- file.choose() #Choose your Zombies.csv file!
+zombies <- read.csv(path, sep=",", header=TRUE)
 ```
 
 I think this should all fit in one function:
@@ -125,8 +125,145 @@ qqnorm(zombies$zombies_killed, main="Normal QQ plot for Zombies Killed")
 qqline(zombies$zombies_killed, col="red")
 ```
 
-The variables Years of Education and Zombies killed are the only two that are not normally distributed. The first three variables - Age, Weight, and Height - are normally distributed, shown by the bell-curves in the Histograms and the data in the QQ plots being nicely on top of the line. 
+The variables Years of Education and Zombies Killed are the only two that are not normally distributed. The first three variables - Age, Weight, and Height - are normally distributed, shown by the bell-curves in the Histograms and the data in the QQ plots being nicely on top of the line. 
+The variables Years of Education and Zombies Killed do not fit the normal distribution, as shown by their skewed distribution in the histogram and the data not fitting perfectly on the line in the QQ plot. I think those variables may have a Poisson distribution because they are counts.
 
 ###[5] Now use the sample() function to sample ONE subset of 30 zombies (without replacement) from this population and calculate the mean and sample standard deviation for each variable. Also estimate the standard error for each variable and construct the 95% confidence interval for each mean. Note that for the variables that are not drawn from the normal distribution, you will need to base your estimate of the CIs on some different distribution.
 
-###[6] Now drawn 99 more random samples of 30 zombies out and calculate the mean for each of the these samples. Together with the first sample you drew out, you now have a set of 100 means for each variable (each based on 30 observations), which constitutes a sampling distribution for each variable. What are the means and standard deviations of this distribution for each variable? How do the standard deviations compare to the standard errors estimated in [5]? What do these sampling distributions look like? Are they normally distributed? What about for those variables that you concluded were not originally drawn from a normal distribution?
+I know I should have different function for the last two variables, but I really don't know how, so I've just used the normal distribution CI calculation, just to make sure I could get all of question 6 to work.
+
+```{r}
+
+subset.function <- function(x){
+  n = 30
+  subset <- zombies[sample(nrow(zombies), n, replace = FALSE), ]
+  mean <- mean(subset[,x])
+  var <- sum((subset[,x] - mean(subset[,x])) ^2) / (length(subset[,x]) -1)
+  sd <- sqrt(var)
+  se <- sd/sqrt(30)
+  critical <- qnorm(0.975)*sd/sqrt(n)
+  ci.lower <- mean-critical
+  ci.upper <- mean+critical
+  outcome <- data.frame(mean, sd, se, ci.lower, ci.upper)
+}
+```
+
+####Age
+
+```{r}
+age <- subset.function(13)
+age
+```
+
+####Height
+
+```{r}
+height <- subset.function(8)
+height
+```
+
+####Weight
+
+```{r}
+weight <- subset.function(9)
+weight
+```
+
+####Zombies Killed
+
+```{r}
+zombies_killed <- subset.function(10)
+zombies_killed
+
+```
+
+####Years of Education
+
+```{r}
+years_of_education <- subset.function(11)
+years_of_education
+```
+
+
+
+###[6] Now drawn 99 more random samples of 30 zombies and calculate the mean for each of the these samples. Together with the first sample you drew out, you now have a set of 100 means for each variable (each based on 30 observations), which constitutes a sampling distribution for each variable. What are the means and standard deviations of this distribution for each variable? How do the standard deviations compare to the standard errors estimated in [5]? What do these sampling distributions look like? Are they normally distributed? What about for those variables that you concluded were not originally drawn from a normal distribution?
+
+```{r}
+zombie.samples <- function(x, first.subset){ 
+  final.outp <- first.subset
+  for (i in 1:99){
+  subset <- zombies[sample(nrow(zombies), 30, replace = FALSE), ]
+  output1 <- subset.function(x)  ## Create a new dataset from the new sample using your previous function
+  final.outp <- rbind(final.outp, output1) ## Then you should join the new data.frame with the previous
+  i <- i+1
+  }
+  return(final.outp)
+}
+```
+
+####Age
+```{r}
+BigAge <- zombie.samples(13, age)
+
+mean(BigAge$mean)
+sd(BigAge$mean)
+
+par(mfrow = c(1, 2))
+hist(BigAge$mean, main="Histogram for Age", col="grey")
+qqnorm(BigAge$mean, main="Normal QQ plot for Age")
+qqline(BigAge$mean, col="red")
+```
+
+####Height
+```{r}
+BigHeight <- zombie.samples(8, height)
+
+mean(BigHeight$mean)
+sd(BigHeight$mean)
+
+par(mfrow = c(1, 2))
+hist(BigHeight$mean, main="Histogram for Height", col="grey")
+qqnorm(BigHeight$mean, main="Normal QQ plot for Height")
+qqline(BigHeight$mean, col="red")
+```
+
+####Weight
+```{r}
+BigWeight <- zombie.samples(9, weight)
+
+mean(BigWeight$mean)
+sd(BigWeight$mean)
+
+par(mfrow = c(1, 2))
+hist(BigWeight$mean, main="Histogram for Weight", col="grey")
+qqnorm(BigWeight$mean, main="Normal QQ plot for Weight")
+qqline(BigWeight$mean, col="red")
+```
+
+####Zombies Killed
+```{r}
+Bigzombies_killed <- zombie.samples(10, zombies_killed)
+
+mean(Bigzombies_killed$mean)
+sd(Bigzombies_killed$mean)
+
+par(mfrow = c(1, 2))
+hist(Bigzombies_killed$mean, main="Histogram for Zombies Killed", col="grey")
+qqnorm(Bigzombies_killed$mean, main="Normal QQ plot for Zombies Killed")
+qqline(Bigzombies_killed$mean, col="red")
+```
+
+####Years of Education
+```{r}
+BigEducation <- zombie.samples(11, years_of_education)
+
+mean(BigEducation$mean)
+sd(BigEducation$mean)
+
+par(mfrow = c(1, 2))
+hist(BigEducation$mean, main="Histogram for Years of Education", col="grey")
+qqnorm(BigEducation$mean, main="Normal QQ plot for Years of Education")
+qqline(BigEducation$mean, col="red")
+```
+
+For all variables, the mean is very close to the population mean, and the standard deviation resembles the standard errors calculated in question 5. When you look at the histograms and QQ plots, you can see that all variables seem norally distributed.
