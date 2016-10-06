@@ -12,7 +12,7 @@ Load in the dataset "zombies.csv" from my GitHub repo at. This data includes the
 
 f <- file.choose() d <- read.csv(f, sep=",", header=TRUE)
 
-###[1] Calculate the population mean and standard deviation for each quantitative random variable (height, weight, age, number of zombies killed, and years of education). NOTE: You will not want to use the built in var() and sd() commands as these are for samples.
+####[1] Calculate the population mean and standard deviation for each quantitative random variable (height, weight, age, number of zombies killed, and years of education). NOTE: You will not want to use the built in var() and sd() commands as these are for samples.
 
 ```{r}
 path <- file.choose() #Choose your Zombies.csv file!
@@ -41,7 +41,7 @@ zombies.function(zombies$zombies_killed)
 zombies.function(zombies$years_of_education)
 ```
 
-###[2] Use ggplot and make boxplots of each of these variables by gender.
+####[2] Use ggplot and make boxplots of each of these variables by gender.
 
 I think this could go in one function too...
 ```{r}
@@ -66,7 +66,7 @@ boxplot.function(zombies$zombies_killed, "Zombies Killed")
 boxplot.function(zombies$years_of_education, "Years of Education")
 ```
 
-###[3] Use ggplot and make scatterplots of height and weight in relation to age. Do these variables seem to be related? In what way?
+####[3] Use ggplot and make scatterplots of height and weight in relation to age. Do these variables seem to be related? In what way?
 
 Ggplot is awesome! You can make really nice looking plots...
 ```{r}
@@ -82,7 +82,7 @@ sp
 
 These plots show that these variales are indeed related. As the zombies grow older, they grow taller and also increase their weight.
 
-###[4] Using histograms and Q-Q plots, check whether the quantitative variables seem to be drawn from a normal distribution. Which seem to be and which do not (hint: not all are drawn from the normal distribution)? For those that are not, can you determine what common distribution they are drawn from?
+####[4] Using histograms and Q-Q plots, check whether the quantitative variables seem to be drawn from a normal distribution. Which seem to be and which do not (hint: not all are drawn from the normal distribution)? For those that are not, can you determine what common distribution they are drawn from?
 
 ```{r}
 par(mfrow = c(1, 2))
@@ -128,7 +128,7 @@ qqline(zombies$zombies_killed, col="red")
 The variables Years of Education and Zombies Killed are the only two that are not normally distributed. The first three variables - Age, Weight, and Height - are normally distributed, shown by the bell-curves in the Histograms and the data in the QQ plots being nicely on top of the line. 
 The variables Years of Education and Zombies Killed do not fit the normal distribution, as shown by their skewed distribution in the histogram and the data not fitting perfectly on the line in the QQ plot. I think those variables may have a Poisson distribution because they are counts.
 
-###[5] Now use the sample() function to sample ONE subset of 30 zombies (without replacement) from this population and calculate the mean and sample standard deviation for each variable. Also estimate the standard error for each variable and construct the 95% confidence interval for each mean. Note that for the variables that are not drawn from the normal distribution, you will need to base your estimate of the CIs on some different distribution.
+####[5] Now use the sample() function to sample ONE subset of 30 zombies (without replacement) from this population and calculate the mean and sample standard deviation for each variable. Also estimate the standard error for each variable and construct the 95% confidence interval for each mean. Note that for the variables that are not drawn from the normal distribution, you will need to base your estimate of the CIs on some different distribution.
 
 I know I should have different function for the last two variables, but I really don't know how, so I've just used the normal distribution CI calculation, just to make sure I could get all of question 6 to work.
 
@@ -186,7 +186,7 @@ years_of_education
 
 
 
-###[6] Now drawn 99 more random samples of 30 zombies and calculate the mean for each of the these samples. Together with the first sample you drew out, you now have a set of 100 means for each variable (each based on 30 observations), which constitutes a sampling distribution for each variable. What are the means and standard deviations of this distribution for each variable? How do the standard deviations compare to the standard errors estimated in [5]? What do these sampling distributions look like? Are they normally distributed? What about for those variables that you concluded were not originally drawn from a normal distribution?
+####[6] Now drawn 99 more random samples of 30 zombies and calculate the mean for each of the these samples. Together with the first sample you drew out, you now have a set of 100 means for each variable (each based on 30 observations), which constitutes a sampling distribution for each variable. What are the means and standard deviations of this distribution for each variable? How do the standard deviations compare to the standard errors estimated in [5]? What do these sampling distributions look like? Are they normally distributed? What about for those variables that you concluded were not originally drawn from a normal distribution?
 
 ```{r}
 zombie.samples <- function(x, first.subset){ 
